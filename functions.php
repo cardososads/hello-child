@@ -75,36 +75,18 @@ function show_form_results($atts) {
     if (!$data) {
         return '<p>Nenhum dado encontrado.</p>';
     }
+    echo '<pre>';
+    echo "Introduções:\n";
+    print_r($introductions);
+
+    echo "\nRepeaters:\n";
+    print_r($all_repeaters['_numeros_destino_516'][$data['destiny_number']]);
+    echo '</pre>';
 
     ob_start();
-    ?>
-    <div class="form-results">
-        <h2>Resultados do Formulário <?php echo esc_html($form); ?></h2>
-        <h3>Dados do Formulário:</h3>
-        <ul>
-            <?php foreach ($data as $key => $value) : ?>
-                <li><strong><?php echo esc_html($key); ?>:</strong> <?php echo esc_html($value); ?></li>
-            <?php endforeach; ?>
-        </ul>
-
-        <h3>Introduções:</h3>
-        <ul>
-            <?php foreach ($introductions as $intro) : ?>
-                <li><?php echo esc_html($intro); ?></li>
-            <?php endforeach; ?>
-        </ul>
-
-        <?php if (isset($data['destiny_number']) && isset($all_repeaters['_numeros_destino_516'][$data['destiny_number']])) : ?>
-            <h3>Número do Destino:</h3>
-            <p><?php echo esc_html($all_repeaters['_numeros_destino_516'][$data['destiny_number']]); ?></p>
-        <?php endif; ?>
-
-        <?php if (isset($data['expression_number']) && isset($all_repeaters['_numeros_expressao_516'][$data['expression_number']])) : ?>
-            <h3>Número de Expressão:</h3>
-            <p><?php echo esc_html($all_repeaters['_numeros_expressao_516'][$data['expression_number']]); ?></p>
-        <?php endif; ?>
-    </div>
-    <?php
+    echo '<pre>';
+    print_r($data);
+    echo '</pre>';
     return ob_get_clean();
 }
 add_shortcode('show_form_results', 'show_form_results');
