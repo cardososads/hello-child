@@ -38,80 +38,56 @@ function display_jetengine_data_shortcode() {
 
 add_shortcode('display_jetengine_data', 'display_jetengine_data_shortcode');
 
-// Processamento do formulário Form1
-function process_form_01($record, $ajax_handler) {
+// Hook para processar o envio dos formulários
+add_action('elementor_pro/forms/new_record', function ($record, $handler) {
+    // Verifique qual formulário foi enviado
+    $form_name = $record->get_form_settings('form_name');
+
+    // Obtenha os dados do formulário
     $raw_fields = $record->get('fields');
-
-    if ($record->get_form_settings('form_id') === 'Form1') {
-        $calculator = new NumerologyCalculator();
-        $birth_date = sanitize_text_field($raw_fields['birth_date']);
-        $_SESSION['first_name'] = sanitize_text_field($raw_fields['first_name']);
-        $_SESSION['birth_date'] = $birth_date;
-        $_SESSION['destiny_number'] = $calculator->calculateDestinyNumber($birth_date);
-
-        // Adicionar var_dump para exibir os resultados
-        echo '<pre>';
-        echo "Resultados do Form1:\n";
-        var_dump($_SESSION['first_name']);
-        var_dump($_SESSION['birth_date']);
-        var_dump($_SESSION['destiny_number']);
-        echo '</pre>';
-
-        $ajax_handler->add_response_data('redirect_url', home_url('/form-02'));
+    $fields = [];
+    foreach ($raw_fields as $id => $field) {
+        $fields[$id] = $field['value'];
     }
-}
-add_action('elementor_pro/forms/new_record', 'process_form_01');
 
-// Processamento do formulário Form2
-function process_form_02($record, $ajax_handler) {
-    $raw_fields = $record->get('fields');
+    // Instancia a classe de cálculo
+    require_once get_stylesheet_directory() . '/class-numerology-calculator.php';
+    $calculator = new NumerologyCalculator();
 
-    if ($record->get_form_settings('form_id') === 'Form2') {
-        $calculator = new NumerologyCalculator();
-        $full_name = sanitize_text_field($raw_fields['full_name']);
-        $_SESSION['gender'] = sanitize_text_field($raw_fields['gender']);
-        $_SESSION['full_name'] = $full_name;
-        $_SESSION['expression_number'] = $calculator->calculateExpressionNumber($full_name);
-
-        // Adicionar var_dump para exibir os resultados do Form1 e Form2
-        echo '<pre>';
-        echo "Resultados do Form1 e Form2:\n";
-        var_dump($_SESSION['first_name']);
-        var_dump($_SESSION['birth_date']);
-        var_dump($_SESSION['destiny_number']);
-        var_dump($_SESSION['gender']);
-        var_dump($_SESSION['full_name']);
-        var_dump($_SESSION['expression_number']);
-        echo '</pre>';
-
-        $ajax_handler->add_response_data('redirect_url', home_url('/form-03'));
+    // Armazena os dados do formulário usando transients para acesso global
+    switch ($form_name) {
+        case 'Form1':
+            // Realiza o cálculo do número de destino
+            $fields['destiny_number'] = $calculator->calculateDestinyNumber($fields['birth_date']);
+            set_transient('form1_submission_data', $fields, 60 * 60); // Armazena por 1 hora
+            break;
+        case 'Form2':
+            // Realiza o cálculo do número de expressão
+            $fields['expression_number'] = $calculator->calculateExpressionNumber($fields['full_name']);
+            set_transient('form2_submission_data', $fields, 60 * 60); // Armazena por 1 hora
+            break;
+        case 'Form3':
+            // Armazena os dados do formulário 3
+            set_transient('form3_submission_data', $fields, 60 * 60); // Armazena por 1 hora
+            break;
     }
-}
-add_action('elementor_pro/forms/new_record', 'process_form_02');
 
-// Processamento do formulário Form3
-function process_form_03($record, $ajax_handler) {
-    $raw_fields = $record->get('fields');
+}, 10, 2);
 
-    if ($record->get_form_settings('form_id') === 'Form3') {
-        $_SESSION['email'] = sanitize_email($raw_fields['email']);
-        $_SESSION['marital_status'] = sanitize_text_field($raw_fields['marital_status']);
+// Shortcode para exibir os resultados dos formulários
+function show_form_results($atts) {
+    $atts = shortcode_atts(['form' => ''], $atts, 'show_form_results');
+    $form = $atts['form'];
+    $data = get_transient($form . '_submission_data');
 
-        // Adicionar var_dump para exibir todos os resultados
-        echo '<pre>';
-        echo "Resultados Finais:\n";
-        var_dump($_SESSION['first_name']);
-        var_dump($_SESSION['birth_date']);
-        var_dump($_SESSION['destiny_number']);
-        var_dump($_SESSION['gender']);
-        var_dump($_SESSION['full_name']);
-        var_dump($_SESSION['expression_number']);
-        var_dump($_SESSION['email']);
-        var_dump($_SESSION['marital_status']);
-        echo '</pre>';
-
-        // Redirecionar para a página de resultado ou outra ação
-        $ajax_handler->add_response_data('redirect_url', home_url('/resultado'));
+    if (!$data) {
+        return '<p>Nenhum dado encontrado.</p>';
     }
+
+    ob_start();
+    echo '<pre>';
+    print_r($data);
+    echo '</pre>';
+    return ob_get_clean();
 }
-add_action('elementor_pro/forms/new_record', 'process_form_03');
+add_shortcode('show_form_results', 'show_form_results');
