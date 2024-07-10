@@ -18,7 +18,7 @@ function display_jetengine_data_shortcode() {
 
     echo '<pre>';
     echo "Introduções:\n";
-    print_r($introductions);
+    print_r($jet_engine_options);
 
     echo "\nRepeaters:\n";
     print_r($all_repeaters);
