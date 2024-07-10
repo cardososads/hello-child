@@ -80,7 +80,7 @@ function show_form_results($atts) {
     print_r($introductions);
 
     echo "\nRepeaters:\n";
-    print_r($all_repeaters['_numeros_destino_516']);
+    print_r($all_repeaters['_numeros_destino_516'][$data['destiny_number']]);
     echo '</pre>';
 
     ob_start();
