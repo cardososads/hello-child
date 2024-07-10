@@ -86,28 +86,64 @@ function show_form_results($atts) {
     if (!$data) {
         return '<p>Nenhum dado encontrado.</p>';
     }
-    print_r(return_initial_audios_and_destiny_number($data['destiny_number']));
+
     $audios_data = return_initial_audios_and_destiny_number($data['destiny_number']);
     $destiny_audio = $audios_data[1];
 
     ob_start();
-    echo '<div class="audio-players">';
+    ?>
+    <div class="audio-players">
+        <?php
+        // Renderizando áudio do número de destino
+        if (isset($destiny_audio['_audio_do_numero'])): ?>
+            <div class="audio-player">
+                <audio controls src="<?php echo esc_url($destiny_audio['_audio_do_numero']); ?>"></audio>
+                <div class="subtitles"></div>
+            </div>
+            <script>
+                const subtitles = <?php echo json_encode($destiny_audio['_legenda_do_audio']); ?>;
+            </script>
+        <?php endif; ?>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var audioPlayers = document.querySelectorAll('.audio-player');
 
-    // Renderizando áudio do número de destino
-    if (isset($destiny_audio['_audio_do_numero'])) {
-        echo '<div class="audio-player">';
-        echo '<audio controls src="' . esc_url($destiny_audio['_audio_do_numero']) . '"></audio>';
-        echo '<div class="subtitles"></div>';
-        echo '</div>';
-    }
+            audioPlayers.forEach(function(player, index) {
+                var audio = player.querySelector('audio');
+                var subtitleDiv = player.querySelector('.subtitles');
+                var subtitlesArray = typeof subtitles !== 'undefined' ? subtitles : [];
 
-    echo '</div>';
+                var currentSubtitleIndex = 0;
 
-    // Passando legendas para o JavaScript
-    echo '<script>';
-    echo 'const subtitles = ' . json_encode($destiny_audio['_legenda_do_audio']) . ';';
-    echo '</script>';
+                audio.addEventListener('timeupdate', function () {
+                    if (currentSubtitleIndex < subtitlesArray.length && audio.currentTime >= subtitlesArray[currentSubtitleIndex].time) {
+                        subtitleDiv.textContent = subtitlesArray[currentSubtitleIndex].text || '...';
+                        currentSubtitleIndex++;
+                    }
+                });
 
+                audio.addEventListener('seeked', function () {
+                    currentSubtitleIndex = 0;
+                    subtitleDiv.textContent = "";
+                });
+
+                audio.addEventListener('pause', function () {
+                    subtitleDiv.textContent = "";
+                });
+
+                audio.addEventListener('ended', function () {
+                    subtitleDiv.textContent = "";
+                });
+
+                audio.addEventListener('play', function () {
+                    currentSubtitleIndex = 0;
+                    subtitleDiv.textContent = "";
+                });
+            });
+        });
+    </script>
+    <?php
     return ob_get_clean();
 }
 add_shortcode('show_form_results', 'show_form_results');
