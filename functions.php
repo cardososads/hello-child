@@ -86,7 +86,7 @@ function show_form_results($atts) {
     if (!$data) {
         return '<p>Nenhum dado encontrado.</p>';
     }
-
+    print_r(return_initial_audios_and_destiny_number($data['destiny_number']));
     $audios_data = return_initial_audios_and_destiny_number($data['destiny_number']);
     $destiny_audio = $audios_data[1];
 
