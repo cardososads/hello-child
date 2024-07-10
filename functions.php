@@ -102,16 +102,7 @@ function show_form_results($atts) {
                 <div class="subtitles"></div>
             </div>
             <script>
-                const subtitlesIntro = [
-                    { time: 0, text: "Olá, tudo bem?" },
-                    { time: 2.5, text: "Nesse momento vamos iniciar nossa jornada de conhecimento," },
-                    { time: 5.8, text: "entendendo como seu nome, data de nascimento e assinatura" },
-                    { time: 9.5, text: "revelam muitos aspectos sobre sua vida." },
-                    { time: 12.7, text: "Com a numerologia cabalística saberemos sobre oportunidades," },
-                    { time: 16, text: "relacionamento, desafios, e outros fatos que podem te ajudar" },
-                    { time: 20.5, text: "a ter autoconhecimento e uma visão única e profunda" },
-                    { time: 23, text: "sobre diversos aspectos da sua existência." }
-                ];
+                const subtitlesIntro = <?php echo json_encode($introductions['legenda_intro']); ?>;
             </script>
         <?php endif;
         if (isset($introductions['pos_intro'])): ?>
@@ -186,3 +177,6 @@ function show_form_results($atts) {
     return ob_get_clean();
 }
 add_shortcode('show_form_results', 'show_form_results');
+
+
+
