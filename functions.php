@@ -40,15 +40,14 @@ add_shortcode('display_jetengine_data', 'display_jetengine_data_shortcode');
 
 // Hook para processar o envio dos formulários
 add_action('elementor_pro/forms/new_record', function ($record, $handler) {
-    // Verifique qual formulário foi enviado
-    $form_name = $record->get_form_settings('form_name');
+    // Certifique-se de que o handler é o Elementor Forms
+    if ('elementor_pro' !== $handler->get_id()) {
+        return;
+    }
 
     // Obtenha os dados do formulário
-    $raw_fields = $record->get('fields');
-    $fields = [];
-    foreach ($raw_fields as $id => $field) {
-        $fields[$id] = $field['value'];
-    }
+    $form_name = $record->get_form_settings('form_name');
+    $fields = $record->get('fields');
 
     // Instancia a classe de cálculo
     $calculator = new NumerologyCalculator();
@@ -57,17 +56,29 @@ add_action('elementor_pro/forms/new_record', function ($record, $handler) {
     switch ($form_name) {
         case 'Form1':
             // Realiza o cálculo do número de destino
-            $fields['destiny_number'] = $calculator->calculateDestinyNumber($fields['birth_date']);
-            set_transient('form1_submission_data', $fields, 60 * 60); // Armazena por 1 hora
+            $data = [];
+            foreach ($fields as $id => $field) {
+                $data[$id] = $field['value'];
+            }
+            $data['destiny_number'] = $calculator->calculateDestinyNumber($data['birth_date']);
+            set_transient('form1_submission_data', $data, 60 * 60); // Armazena por 1 hora
             break;
         case 'Form2':
             // Realiza o cálculo do número de expressão
-            $fields['expression_number'] = $calculator->calculateExpressionNumber($fields['full_name']);
-            set_transient('form2_submission_data', $fields, 60 * 60); // Armazena por 1 hora
+            $data = [];
+            foreach ($fields as $id => $field) {
+                $data[$id] = $field['value'];
+            }
+            $data['expression_number'] = $calculator->calculateExpressionNumber($data['full_name']);
+            set_transient('form2_submission_data', $data, 60 * 60); // Armazena por 1 hora
             break;
         case 'Form3':
             // Armazena os dados do formulário 3
-            set_transient('form3_submission_data', $fields, 60 * 60); // Armazena por 1 hora
+            $data = [];
+            foreach ($fields as $id => $field) {
+                $data[$id] = $field['value'];
+            }
+            set_transient('form3_submission_data', $data, 60 * 60); // Armazena por 1 hora
             break;
     }
 }, 10, 2);
