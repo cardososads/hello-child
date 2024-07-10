@@ -70,7 +70,6 @@ add_action('elementor_pro/forms/new_record', function ($record, $handler) {
             set_transient('form3_submission_data', $fields, 60 * 60); // Armazena por 1 hora
             break;
     }
-
 }, 10, 2);
 
 // Shortcode para exibir os resultados dos formulários
