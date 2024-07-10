@@ -135,9 +135,8 @@ function add_custom_js() {
 
                 // Convertendo a string de legendas para um array de objetos
                 try {
-                    subtitlesString = subtitlesString.replace(/const subtitles = \[|\];/g, '').trim();
-                    subtitlesString = subtitlesString.replace(/&quot;/g, '"');
-                    subtitles = JSON.parse('[' + subtitlesString + ']');
+                    subtitlesString = subtitlesString.replace(/const subtitles = |;/g, '').trim();
+                    subtitles = JSON.parse(subtitlesString.replace(/&quot;/g, '"'));
                 } catch (e) {
                     console.error('Erro ao processar as legendas: ', e);
                 }
@@ -169,22 +168,11 @@ function add_custom_js() {
                 audio.addEventListener('ended', function() {
                     subtitleDiv.textContent = '';
                 });
-
-                audio.addEventListener('seeked', function() {
-                    currentSubtitleIndex = 0;
-                    subtitleDiv.textContent = "";
-                });
-
-                audio.addEventListener('play', function() {
-                    currentSubtitleIndex = 0;
-                    subtitleDiv.textContent = "";
-                });
             });
         });
     </script>
     <?php
 }
 add_action('wp_footer', 'add_custom_js');
-
 
 
