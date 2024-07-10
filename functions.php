@@ -97,13 +97,13 @@ function show_form_results($atts) {
     if (isset($introductions['audio_introdutorio'])) {
         echo '<div class="audio-player">';
         echo '<audio controls src="' . esc_url($introductions['audio_introdutorio']) . '"></audio>';
-        echo '<div class="subtitles" data-subtitles=\'' . esc_attr($introductions['legenda_intro']) . '\'></div>';
+        echo '<div class="subtitles" data-subtitles=\'' . json_encode(json_decode($introductions['legenda_intro'], true)) . '\'></div>';
         echo '</div>';
     }
     if (isset($introductions['pos_intro'])) {
         echo '<div class="audio-player">';
         echo '<audio controls src="' . esc_url($introductions['pos_intro']) . '"></audio>';
-        echo '<div class="subtitles" data-subtitles=\'' . esc_attr($introductions['legenda_pos_intro']) . '\'></div>';
+        echo '<div class="subtitles" data-subtitles=\'' . json_encode(json_decode($introductions['legenda_pos_intro'], true)) . '\'></div>';
         echo '</div>';
     }
 
@@ -112,7 +112,8 @@ function show_form_results($atts) {
     if (isset($destiny_audio['_audio_do_numero'])) {
         echo '<div class="audio-player">';
         echo '<audio controls src="' . esc_url($destiny_audio['_audio_do_numero']) . '"></audio>';
-        echo '<div class="subtitles" data-subtitles=\'' . esc_attr($destiny_audio['_legenda_do_audio']) . '\'></div>';
+        echo '<div class="subtitles" data-subtitles=\'' . json_encode(json_decode($destiny_audio['_legenda_do_audio'], true)) . '\'></div>';
+        echo '</div>';
     }
 
     echo '</div>';
@@ -129,19 +130,34 @@ function add_custom_js() {
             audioPlayers.forEach(function(player) {
                 var audio = player.querySelector('audio');
                 var subtitleDiv = player.querySelector('.subtitles');
-                var subtitles = JSON.parse(subtitleDiv.getAttribute('data-subtitles').replace(/const subtitles = |;/g, '').replace(/&quot;/g, '"'));
+                var subtitles = JSON.parse(subtitleDiv.getAttribute('data-subtitles'));
 
-                audio.addEventListener('timeupdate', function() {
-                    var currentTime = audio.currentTime;
-                    var currentSubtitle = subtitles.find(function(subtitle) {
-                        return currentTime >= subtitle.time;
+                var timeoutHandles = [];
+
+                audio.addEventListener('play', function() {
+                    // Clear any existing timeouts
+                    timeoutHandles.forEach(function(handle) {
+                        clearTimeout(handle);
                     });
+                    timeoutHandles = [];
 
-                    if (currentSubtitle) {
-                        subtitleDiv.textContent = currentSubtitle.text;
-                    } else {
-                        subtitleDiv.textContent = '';
-                    }
+                    subtitles.forEach(function(subtitle) {
+                        var handle = setTimeout(function() {
+                            subtitleDiv.textContent = subtitle.text;
+                        }, subtitle.time * 1000);
+                        timeoutHandles.push(handle);
+                    });
+                });
+
+                audio.addEventListener('pause', function() {
+                    timeoutHandles.forEach(function(handle) {
+                        clearTimeout(handle);
+                    });
+                    timeoutHandles = [];
+                });
+
+                audio.addEventListener('ended', function() {
+                    subtitleDiv.textContent = '';
                 });
             });
         });
@@ -149,3 +165,4 @@ function add_custom_js() {
     <?php
 }
 add_action('wp_footer', 'add_custom_js');
+
