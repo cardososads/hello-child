@@ -8,31 +8,23 @@ require_once get_stylesheet_directory() . '/class-jetengine-options.php';
 
 new Theme_Setup();
 
-class JetEngine_Shortcode {
-    private $jet_engine_options;
+function display_jetengine_data_shortcode() {
+    $jet_engine_options = new JetEngine_Options('_audios');
 
-    public function __construct() {
-        $this->get_field('_audios');
-        var_dump($this->jet_engine_options);
-        add_shortcode('display_jetengine_data', [$this, 'display_data_shortcode']);
-    }
+    $introductions = $jet_engine_options->get_introductions();
+    $all_repeaters = $jet_engine_options->get_all_repeaters();
 
-    public function display_data_shortcode($atts) {
-        $introductions = $this->jet_engine_options->get_introductions();
-        $all_repeaters = $this->jet_engine_options->get_all_repeaters();
+    ob_start();
 
-        ob_start();
+    echo '<pre>';
+    echo "Introduções:\n";
+    print_r($introductions);
 
-        echo '<pre>';
-        echo "Introduções:\n";
-        print_r($introductions);
+    echo "\nRepeaters:\n";
+    print_r($all_repeaters);
+    echo '</pre>';
 
-        echo "\nRepeaters:\n";
-        print_r($all_repeaters);
-        echo '</pre>';
-
-        return ob_get_clean();
-    }
+    return ob_get_clean();
 }
 
-new JetEngine_Shortcode();
+add_shortcode('display_jetengine_data', 'display_jetengine_data_shortcode');
