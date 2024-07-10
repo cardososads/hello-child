@@ -39,7 +39,14 @@ function display_jetengine_data_shortcode() {
 add_shortcode('display_jetengine_data', 'display_jetengine_data_shortcode');
 
 // Hook para processar o envio dos formulários
-add_action('elementor_pro/forms/new_record', function ($record, $handler) {
+add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission', 10, 2);
+
+function process_elementor_form_submission($record, $handler) {
+    // Verifique se o handler é o Elementor Forms
+    if ('elementor_pro' !== $handler->get_id()) {
+        return;
+    }
+
     // Verifique qual formulário foi enviado
     $form_name = $record->get_form_settings('form_name');
 
@@ -51,7 +58,6 @@ add_action('elementor_pro/forms/new_record', function ($record, $handler) {
     }
 
     // Instancia a classe de cálculo
-    require_once get_stylesheet_directory() . '/class-numerology-calculator.php';
     $calculator = new NumerologyCalculator();
 
     // Armazena os dados do formulário usando transients para acesso global
@@ -71,8 +77,7 @@ add_action('elementor_pro/forms/new_record', function ($record, $handler) {
             set_transient('form3_submission_data', $fields, 60 * 60); // Armazena por 1 hora
             break;
     }
-
-}, 10, 2);
+}
 
 // Shortcode para exibir os resultados dos formulários
 function show_form_results($atts) {
@@ -85,9 +90,17 @@ function show_form_results($atts) {
     }
 
     ob_start();
-    echo '<pre>';
-    print_r($data);
-    echo '</pre>';
+    ?>
+    <div class="form-results">
+        <h2>Resultados do Formulário <?php echo esc_html($form); ?></h2>
+        <h3>Dados do Formulário:</h3>
+        <ul>
+            <?php foreach ($data as $key => $value) : ?>
+                <li><strong><?php echo esc_html($key); ?>:</strong> <?php echo esc_html($value); ?></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+    <?php
     return ob_get_clean();
 }
 add_shortcode('show_form_results', 'show_form_results');
