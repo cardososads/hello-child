@@ -88,94 +88,85 @@ function show_form_results($atts) {
     }
 
     $audios_data = return_initial_audios_and_destiny_number($data['destiny_number']);
+    $destiny_audio = $audios_data[1];
 
     ob_start();
-    echo '<div class="audio-players">';
-
-    // Renderizando áudios de introdução
-    $introductions = $audios_data[0];
-    if (isset($introductions['audio_introdutorio'])) {
-        echo '<div class="audio-player">';
-        echo '<audio controls src="' . esc_url($introductions['audio_introdutorio']) . '"></audio>';
-        echo '<div class="subtitles" data-subtitles="' . esc_attr($introductions['legenda_intro']) . '"></div>';
-        echo '</div>';
-    }
-    if (isset($introductions['pos_intro'])) {
-        echo '<div class="audio-player">';
-        echo '<audio controls src="' . esc_url($introductions['pos_intro']) . '"></audio>';
-        echo '<div class="subtitles" data-subtitles="' . esc_attr($introductions['legenda_pos_intro']) . '"></div>';
-        echo '</div>';
-    }
-
-    // Renderizando áudio do número de destino
-    $destiny_audio = $audios_data[1];
-    if (isset($destiny_audio['_audio_do_numero'])) {
-        echo '<div class="audio-player">';
-        echo '<audio controls src="' . esc_url($destiny_audio['_audio_do_numero']) . '"></audio>';
-        echo '<div class="subtitles" data-subtitles="' . esc_attr($destiny_audio['_legenda_do_audio']) . '"></div>';
-        echo '</div>';
-    }
-
-    echo '</div>';
-    return ob_get_clean();
-}
-add_shortcode('show_form_results', 'show_form_results');
-
-function add_custom_js() {
     ?>
+    <div class="audio-players">
+        <?php
+        // Renderizando áudios de introdução
+        $introductions = $audios_data[0];
+        if (isset($introductions['audio_introdutorio'])): ?>
+            <div class="audio-player">
+                <audio controls src="<?php echo esc_url($introductions['audio_introdutorio']); ?>"></audio>
+                <div class="subtitles"></div>
+            </div>
+            <script>
+                const subtitlesIntro = <?php echo json_encode($introductions['legenda_intro']); ?>;
+            </script>
+        <?php endif;
+        if (isset($introductions['pos_intro'])): ?>
+            <div class="audio-player">
+                <audio controls src="<?php echo esc_url($introductions['pos_intro']); ?>"></audio>
+                <div class="subtitles"></div>
+            </div>
+            <script>
+                const subtitlesPosIntro = <?php echo json_encode($introductions['legenda_pos_intro']); ?>;
+            </script>
+        <?php endif;
+
+        // Renderizando áudio do número de destino
+        if (isset($destiny_audio['_audio_do_numero'])): ?>
+            <div class="audio-player">
+                <audio controls src="<?php echo esc_url($destiny_audio['_audio_do_numero']); ?>"></audio>
+                <div class="subtitles"></div>
+            </div>
+            <script>
+                const subtitlesDestiny = <?php echo json_encode($destiny_audio['_legenda_do_audio']); ?>;
+            </script>
+        <?php endif; ?>
+    </div>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var audioPlayers = document.querySelectorAll('.audio-player');
 
-            audioPlayers.forEach(function(player) {
+            audioPlayers.forEach(function(player, index) {
                 var audio = player.querySelector('audio');
                 var subtitleDiv = player.querySelector('.subtitles');
-                var subtitlesString = subtitleDiv.getAttribute('data-subtitles');
                 var subtitles = [];
 
-                // Convertendo a string de legendas para um array de objetos
-                try {
-                    subtitlesString = subtitlesString.replace(/const subtitles = \[|\];/g, '').trim();
-                    subtitlesString = subtitlesString.replace(/&quot;/g, '"');
-                    subtitles = JSON.parse('[' + subtitlesString + ']');
-                } catch (e) {
-                    console.error('Erro ao processar as legendas: ', e);
+                // Seleciona o conjunto correto de legendas
+                if (index === 0) {
+                    subtitles = typeof subtitlesIntro !== 'undefined' ? subtitlesIntro : [];
+                } else if (index === 1) {
+                    subtitles = typeof subtitlesPosIntro !== 'undefined' ? subtitlesPosIntro : [];
+                } else if (index === 2) {
+                    subtitles = typeof subtitlesDestiny !== 'undefined' ? subtitlesDestiny : [];
                 }
 
-                var timeoutHandles = [];
+                var currentSubtitleIndex = 0;
 
-                audio.addEventListener('play', function() {
-                    // Clear any existing timeouts
-                    timeoutHandles.forEach(function(handle) {
-                        clearTimeout(handle);
-                    });
-                    timeoutHandles = [];
-
-                    subtitles.forEach(function(subtitle) {
-                        var handle = setTimeout(function() {
-                            subtitleDiv.textContent = subtitle.text;
-                        }, subtitle.time * 1000);
-                        timeoutHandles.push(handle);
-                    });
+                audio.addEventListener('timeupdate', function () {
+                    if (currentSubtitleIndex < subtitles.length && audio.currentTime >= subtitles[currentSubtitleIndex].time) {
+                        subtitleDiv.textContent = subtitles[currentSubtitleIndex].text || '...';
+                        currentSubtitleIndex++;
+                    }
                 });
 
-                audio.addEventListener('pause', function() {
-                    timeoutHandles.forEach(function(handle) {
-                        clearTimeout(handle);
-                    });
-                    timeoutHandles = [];
-                });
-
-                audio.addEventListener('ended', function() {
-                    subtitleDiv.textContent = '';
-                });
-
-                audio.addEventListener('seeked', function() {
+                audio.addEventListener('seeked', function () {
                     currentSubtitleIndex = 0;
                     subtitleDiv.textContent = "";
                 });
 
-                audio.addEventListener('play', function() {
+                audio.addEventListener('pause', function () {
+                    subtitleDiv.textContent = "";
+                });
+
+                audio.addEventListener('ended', function () {
+                    subtitleDiv.textContent = "";
+                });
+
+                audio.addEventListener('play', function () {
                     currentSubtitleIndex = 0;
                     subtitleDiv.textContent = "";
                 });
@@ -183,8 +174,9 @@ function add_custom_js() {
         });
     </script>
     <?php
+    return ob_get_clean();
 }
-add_action('wp_footer', 'add_custom_js');
+add_shortcode('show_form_results', 'show_form_results');
 
 
 
