@@ -67,10 +67,21 @@ function show_form_results($atts) {
     $atts = shortcode_atts(['form' => ''], $atts, 'show_form_results');
     $form = $atts['form'];
     $data = get_transient($form . '_submission_data');
+    $jet_engine_options = new JetEngine_Options();
+
+    $introductions = $jet_engine_options->get_introductions();
+    $all_repeaters = $jet_engine_options->get_all_repeaters();
 
     if (!$data) {
         return '<p>Nenhum dado encontrado.</p>';
     }
+    echo '<pre>';
+    echo "Introduções:\n";
+    print_r($introductions);
+
+    echo "\nRepeaters:\n";
+    print_r($all_repeaters['_numeros_destino_516']);
+    echo '</pre>';
 
     ob_start();
     echo '<pre>';
@@ -80,23 +91,23 @@ function show_form_results($atts) {
 }
 add_shortcode('show_form_results', 'show_form_results');
 
-function display_jetengine_data_shortcode() {
-    $jet_engine_options = new JetEngine_Options();
-
-    $introductions = $jet_engine_options->get_introductions();
-    $all_repeaters = $jet_engine_options->get_all_repeaters();
-
-    ob_start();
-
-    echo '<pre>';
-    echo "Introduções:\n";
-    print_r($introductions);
-
-    echo "\nRepeaters:\n";
-    print_r($all_repeaters);
-    echo '</pre>';
-
-    return ob_get_clean();
-}
-
-add_shortcode('display_jetengine_data', 'display_jetengine_data_shortcode');
+//function display_jetengine_data_shortcode() {
+//    $jet_engine_options = new JetEngine_Options();
+//
+//    $introductions = $jet_engine_options->get_introductions();
+//    $all_repeaters = $jet_engine_options->get_all_repeaters();
+//
+//    ob_start();
+//
+//    echo '<pre>';
+//    echo "Introduções:\n";
+//    print_r($introductions);
+//
+//    echo "\nRepeaters:\n";
+//    print_r($all_repeaters);
+//    echo '</pre>';
+//
+//    return ob_get_clean();
+//}
+//
+//add_shortcode('display_jetengine_data', 'display_jetengine_data_shortcode');
