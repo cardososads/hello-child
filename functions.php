@@ -73,9 +73,7 @@ function show_form_results($atts) {
     }
 
     ob_start();
-    echo '<pre>';
-    print_r($data['destiny_number']);
-    echo '</pre>';
+    echo $data['destiny_number'];
     return ob_get_clean();
 }
 add_shortcode('show_form_results', 'show_form_results');
