@@ -17,26 +17,14 @@ require_once get_stylesheet_directory() . '/class-numerology-calculator.php';
 
 new Theme_Setup();
 
-function display_jetengine_data_shortcode() {
+function return_destiny_number($destiny_number) {
     $jet_engine_options = new JetEngine_Options();
 
     $introductions = $jet_engine_options->get_introductions();
     $all_repeaters = $jet_engine_options->get_all_repeaters();
 
-    ob_start();
-
-    echo '<pre>';
-    echo "Introduções:\n";
-    print_r($introductions);
-
-    echo "\nRepeaters:\n";
-    print_r($all_repeaters);
-    echo '</pre>';
-
-    return ob_get_clean();
+    return [$introductions, $all_repeaters[$destiny_number]];
 }
-
-add_shortcode('display_jetengine_data', 'display_jetengine_data_shortcode');
 
 // Hook para processar o envio dos formulários
 add_action('elementor_pro/forms/new_record', function ($record, $handler) {
@@ -86,7 +74,7 @@ function show_form_results($atts) {
 
     ob_start();
     echo '<pre>';
-    print_r($data);
+    print_r(return_destiny_number($data['destiny_number']));
     echo '</pre>';
     return ob_get_clean();
 }
