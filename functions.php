@@ -65,6 +65,7 @@ add_action('elementor_pro/forms/new_record', function ($record, $handler) {
 
             // Recupera os áudios de introdução e destino
             $jet_engine_options = new JetEngine_Options();
+            $introductions = $jet_engine_options->get_introductions();
             $all_repeaters = $jet_engine_options->get_all_repeaters();
 
             // Filtra o áudio correspondente ao número de destino
@@ -73,6 +74,9 @@ add_action('elementor_pro/forms/new_record', function ($record, $handler) {
             } else {
                 $data['destiny_audio'] = 'Nenhum áudio encontrado para o número de destino.';
             }
+
+            // Armazena os áudios de introdução
+            $data['introductions'] = $introductions;
 
             set_transient('form1_submission_data', $data, 60 * 60); // Armazena por 1 hora
             break;
@@ -110,7 +114,11 @@ function show_form_results($atts) {
 
     ob_start();
     echo '<pre>';
-    print_r($data);
+    echo "Áudios de Introdução:\n";
+    print_r($data['introductions']);
+
+    echo "\nÁudio do Número de Destino:\n";
+    print_r($data['destiny_audio']);
     echo '</pre>';
     return ob_get_clean();
 }
