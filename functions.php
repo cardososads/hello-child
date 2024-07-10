@@ -101,7 +101,7 @@ function show_form_results($atts) {
             </div>
             <script>
                 const subtitlesIntro = [
-                    { time: 0, text: "Olá, tudo bem?" },
+                    { time: 0, text: "Olá,, tudo bem?" },
                     { time: 2.5, text: "Nesse momento vamos iniciar nossa jornada de conhecimento," },
                     { time: 5.8, text: "entendendo como seu nome, data de nascimento e assinatura" },
                     { time: 9.5, text: "revelam muitos aspectos sobre sua vida." },
