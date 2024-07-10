@@ -21,15 +21,15 @@ class JetEngine_Options {
 
     public function get_all_repeaters() {
         $repeaters = [
-            'numeros_destino_516',
-            'numeros_expressao_masculinos',
-            'numeros_expressao_femininos',
-            'numeros_expressao_sem_genero',
-            'numeros_motivacao_masculino_casado',
-            'numeros_motivacao_masculino_solteiro',
-            'numeros_motivacao_feminino_casada',
-            'numeros_motivacao_feminino_solteira',
-            'numeros_motivacao_outros'
+            '_numeros_destino_516',
+            '_numeros_expressao_masculinos',
+            '_numeros_expressao_femininos',
+            '_numeros_expressao_sem_genero',
+            '_numeros_motivacao_masculino_casado',
+            '_numeros_motivacao_masculino_solteiro',
+            '_numeros_motivacao_feminino_casada',
+            '_numeros_motivacao_feminino_solteira',
+            '_numeros_motivacao_outros'
         ];
 
         $results = [];
