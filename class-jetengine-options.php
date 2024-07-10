@@ -4,18 +4,18 @@ if (!defined('ABSPATH')) {
 }
 
 class JetEngine_Options {
-    private $options_slug;
+    private $audios;
 
-    public function __construct($options_slug) {
-        $this->options_slug = $options_slug;
+    public function __construct() {
+        $this->audios = get_option('_audios');
     }
 
     public function get_introductions() {
         return [
-            'audio_introdutorio' => get_option('_audio-introdutorio'),
-            'legenda_intro' => get_option('_legenda-intro'),
-            'pos_intro' => get_option('_pos-intro'),
-            'legenda_pos_intro' => get_option('_legenda-pos-intro')
+            'audio_introdutorio' => $this->audios['_audio-introdutorio'] ?? '',
+            'legenda_intro' => $this->audios['_legenda-intro'] ?? '',
+            'pos_intro' => $this->audios['_pos-intro'] ?? '',
+            'legenda_pos_intro' => $this->audios['_legenda-pos-intro'] ?? ''
         ];
     }
 
@@ -35,7 +35,7 @@ class JetEngine_Options {
         $results = [];
 
         foreach ($repeaters as $repeater) {
-            $results[$repeater] = get_option($repeater);
+            $results[$repeater] = $this->audios[$repeater] ?? [];
         }
 
         return $results;
