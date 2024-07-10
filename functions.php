@@ -17,6 +17,27 @@ require_once get_stylesheet_directory() . '/class-numerology-calculator.php';
 
 new Theme_Setup();
 
+function display_jetengine_data_shortcode() {
+    $jet_engine_options = new JetEngine_Options();
+
+    $introductions = $jet_engine_options->get_introductions();
+    $all_repeaters = $jet_engine_options->get_all_repeaters();
+
+    ob_start();
+
+    echo '<pre>';
+    echo "Introduções:\n";
+    print_r($introductions);
+
+    echo "\nRepeaters:\n";
+    print_r($all_repeaters);
+    echo '</pre>';
+
+    return ob_get_clean();
+}
+
+add_shortcode('display_jetengine_data', 'display_jetengine_data_shortcode');
+
 // Hook para processar o envio dos formulários
 add_action('elementor_pro/forms/new_record', function ($record, $handler) {
     // Certifique-se de que o handler é o Elementor Forms
@@ -79,24 +100,3 @@ function show_form_results($atts) {
     return ob_get_clean();
 }
 add_shortcode('show_form_results', 'show_form_results');
-
-function display_jetengine_data_shortcode() {
-    $jet_engine_options = new JetEngine_Options();
-
-    $introductions = $jet_engine_options->get_introductions();
-    $all_repeaters = $jet_engine_options->get_all_repeaters();
-
-    ob_start();
-
-    echo '<pre>';
-    echo "Introduções:\n";
-    print_r($introductions);
-
-    echo "\nRepeaters:\n";
-    print_r($all_repeaters);
-    echo '</pre>';
-
-    return ob_get_clean();
-}
-
-add_shortcode('display_jetengine_data', 'display_jetengine_data_shortcode');
