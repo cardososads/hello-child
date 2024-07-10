@@ -97,13 +97,13 @@ function show_form_results($atts) {
     if (isset($introductions['audio_introdutorio'])) {
         echo '<div class="audio-player">';
         echo '<audio controls src="' . esc_url($introductions['audio_introdutorio']) . '"></audio>';
-        echo '<div class="subtitles" data-subtitles="' . esc_attr($introductions['legenda_intro']) . '"></div>';
+        echo '<div class="subtitles" data-subtitles=\'' . esc_attr($introductions['legenda_intro']) . '\'></div>';
         echo '</div>';
     }
     if (isset($introductions['pos_intro'])) {
         echo '<div class="audio-player">';
         echo '<audio controls src="' . esc_url($introductions['pos_intro']) . '"></audio>';
-        echo '<div class="subtitles" data-subtitles="' . esc_attr($introductions['legenda_pos_intro']) . '"></div>';
+        echo '<div class="subtitles" data-subtitles=\'' . esc_attr($introductions['legenda_pos_intro']) . '\'></div>';
         echo '</div>';
     }
 
@@ -112,8 +112,7 @@ function show_form_results($atts) {
     if (isset($destiny_audio['_audio_do_numero'])) {
         echo '<div class="audio-player">';
         echo '<audio controls src="' . esc_url($destiny_audio['_audio_do_numero']) . '"></audio>';
-        echo '<div class="subtitles" data-subtitles="' . esc_attr($destiny_audio['_legenda_do_audio']) . '"></div>';
-        echo '</div>';
+        echo '<div class="subtitles" data-subtitles=\'' . esc_attr($destiny_audio['_legenda_do_audio']) . '\'></div>';
     }
 
     echo '</div>';
@@ -130,7 +129,7 @@ function add_custom_js() {
             audioPlayers.forEach(function(player) {
                 var audio = player.querySelector('audio');
                 var subtitleDiv = player.querySelector('.subtitles');
-                var subtitles = JSON.parse(subtitleDiv.getAttribute('data-subtitles').replace(/const subtitles = |;/g, ''));
+                var subtitles = JSON.parse(subtitleDiv.getAttribute('data-subtitles').replace(/const subtitles = |;/g, '').replace(/&quot;/g, '"'));
 
                 audio.addEventListener('timeupdate', function() {
                     var currentTime = audio.currentTime;
