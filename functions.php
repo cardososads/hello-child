@@ -23,7 +23,7 @@ function return_destiny_number($destiny_number) {
     $introductions = $jet_engine_options->get_introductions();
     $all_repeaters = $jet_engine_options->get_all_repeaters();
 
-    return [$introductions, $all_repeaters[$destiny_number]];
+    return [$introductions, $all_repeaters['_numeros_destino_516'][$destiny_number]];
 }
 
 // Hook para processar o envio dos formulários
