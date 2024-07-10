@@ -17,14 +17,29 @@ require_once get_stylesheet_directory() . '/class-numerology-calculator.php';
 
 new Theme_Setup();
 
-function return_destiny_number($destiny_number) {
+function return_initial_audios_and_destiny_number($destiny_number) {
     $jet_engine_options = new JetEngine_Options();
-
     $introductions = $jet_engine_options->get_introductions();
     $all_repeaters = $jet_engine_options->get_all_repeaters();
 
-    return [$introductions, $all_repeaters['_numeros_destino_516'][$destiny_number]];
+    $result = [];
+
+    // Áudios de introdução
+    $result[] = $introductions;
+
+    // Áudio do número de destino
+    if (isset($all_repeaters['_numeros_destino_516'][$destiny_number])) {
+        $result[] = $all_repeaters['_numeros_destino_516'][$destiny_number];
+    } else {
+        $result[] = [
+            '_audio_do_numero' => 'Nenhum áudio encontrado para o número de destino.',
+            '_legenda_do_audio' => '',
+        ];
+    }
+
+    return $result;
 }
+
 
 // Hook para processar o envio dos formulários
 add_action('elementor_pro/forms/new_record', function ($record, $handler) {
@@ -72,10 +87,37 @@ function show_form_results($atts) {
         return '<p>Nenhum dado encontrado.</p>';
     }
 
+    $audios_data = return_initial_audios_and_destiny_number($data['destiny_number']);
+
     ob_start();
-    echo '<pre>';
-    print_r(return_destiny_number($data['destiny_number']));
-    echo '<pre>';
+    echo '<div class="audio-players">';
+
+    // Renderizando áudios de introdução
+    $introductions = $audios_data[0];
+    if (isset($introductions['audio_introdutorio'])) {
+        echo '<div class="audio-player">';
+        echo '<audio controls src="' . esc_url($introductions['audio_introdutorio']) . '"></audio>';
+        echo '<pre>' . esc_html($introductions['legenda_intro']) . '</pre>';
+        echo '</div>';
+    }
+    if (isset($introductions['pos_intro'])) {
+        echo '<div class="audio-player">';
+        echo '<audio controls src="' . esc_url($introductions['pos_intro']) . '"></audio>';
+        echo '<pre>' . esc_html($introductions['legenda_pos_intro']) . '</pre>';
+        echo '</div>';
+    }
+
+    // Renderizando áudio do número de destino
+    $destiny_audio = $audios_data[1];
+    if (isset($destiny_audio['_audio_do_numero'])) {
+        echo '<div class="audio-player">';
+        echo '<audio controls src="' . esc_url($destiny_audio['_audio_do_numero']) . '"></audio>';
+        echo '<pre>' . esc_html($destiny_audio['_legenda_do_audio']) . '</pre>';
+        echo '</div>';
+    }
+
+    echo '</div>';
     return ob_get_clean();
 }
 add_shortcode('show_form_results', 'show_form_results');
+
