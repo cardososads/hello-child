@@ -88,20 +88,66 @@ function show_form_results($atts) {
     }
 
     $audios_data = return_initial_audios_and_destiny_number($data['destiny_number']);
+    $introductions = $audios_data[0];
     $destiny_audio = $audios_data[1];
 
     ob_start();
     ?>
     <div class="audio-players">
-        <?php
-        // Renderizando áudio do número de destino
-        if (isset($destiny_audio['_audio_do_numero'])): ?>
+        <?php if (isset($introductions['audio_introdutorio'])): ?>
+            <div class="audio-player">
+                <audio controls src="<?php echo esc_url($introductions['audio_introdutorio']); ?>"></audio>
+                <div class="subtitles"></div>
+            </div>
+            <script>
+                const subtitlesIntro = [
+                    { time: 0, text: "Olá, tudo bem?" },
+                    { time: 2.5, text: "Nesse momento vamos iniciar nossa jornada de conhecimento," },
+                    { time: 5.8, text: "entendendo como seu nome, data de nascimento e assinatura" },
+                    { time: 9.5, text: "revelam muitos aspectos sobre sua vida." },
+                    { time: 12.7, text: "Com a numerologia cabalística saberemos sobre oportunidades," },
+                    { time: 16, text: "relacionamento, desafios, e outros fatos que podem te ajudar" },
+                    { time: 20.5, text: "a ter autoconhecimento e uma visão única e profunda" },
+                    { time: 23, text: "sobre diversos aspectos da sua existência." }
+                ];
+            </script>
+        <?php endif; ?>
+
+        <?php if (isset($introductions['pos_intro'])): ?>
+            <div class="audio-player">
+                <audio controls src="<?php echo esc_url($introductions['pos_intro']); ?>"></audio>
+                <div class="subtitles"></div>
+            </div>
+            <script>
+                const subtitlesPosIntro = [
+                    { time: 0, text: "..." },
+                    { time: 2.5, text: "..." },
+                    { time: 5.8, text: "..." },
+                    { time: 9.5, text: "..." },
+                    { time: 12.7, text: "..." },
+                    { time: 16, text: "..." },
+                    { time: 20.5, text: "..." },
+                    { time: 23, text: "..." }
+                ];
+            </script>
+        <?php endif; ?>
+
+        <?php if (isset($destiny_audio['_audio_do_numero'])): ?>
             <div class="audio-player">
                 <audio controls src="<?php echo esc_url($destiny_audio['_audio_do_numero']); ?>"></audio>
                 <div class="subtitles"></div>
             </div>
             <script>
-                const subtitles = <?php echo json_encode($destiny_audio['_legenda_do_audio']); ?>;
+                const subtitlesDestiny = [
+                    { time: 0, text: "..." },
+                    { time: 2.5, text: "..." },
+                    { time: 5.8, text: "..." },
+                    { time: 9.5, text: "..." },
+                    { time: 12.7, text: "..." },
+                    { time: 16, text: "..." },
+                    { time: 20.5, text: "..." },
+                    { time: 23, text: "..." }
+                ];
             </script>
         <?php endif; ?>
     </div>
@@ -112,13 +158,22 @@ function show_form_results($atts) {
             audioPlayers.forEach(function(player, index) {
                 var audio = player.querySelector('audio');
                 var subtitleDiv = player.querySelector('.subtitles');
-                var subtitlesArray = typeof subtitles !== 'undefined' ? subtitles : [];
+                var subtitles = [];
+
+                // Seleciona o conjunto correto de legendas
+                if (index === 0) {
+                    subtitles = typeof subtitlesIntro !== 'undefined' ? subtitlesIntro : [];
+                } else if (index === 1) {
+                    subtitles = typeof subtitlesPosIntro !== 'undefined' ? subtitlesPosIntro : [];
+                } else if (index === 2) {
+                    subtitles = typeof subtitlesDestiny !== 'undefined' ? subtitlesDestiny : [];
+                }
 
                 var currentSubtitleIndex = 0;
 
                 audio.addEventListener('timeupdate', function () {
-                    if (currentSubtitleIndex < subtitlesArray.length && audio.currentTime >= subtitlesArray[currentSubtitleIndex].time) {
-                        subtitleDiv.textContent = subtitlesArray[currentSubtitleIndex].text || '...';
+                    if (currentSubtitleIndex < subtitles.length && audio.currentTime >= subtitles[currentSubtitleIndex].time) {
+                        subtitleDiv.textContent = subtitles[currentSubtitleIndex].text || '...';
                         currentSubtitleIndex++;
                     }
                 });
