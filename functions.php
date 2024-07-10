@@ -12,7 +12,7 @@ class JetEngine_Shortcode {
     private $jet_engine_options;
 
     public function __construct() {
-        $this->jet_engine_options = new JetEngine_Options('_audios');
+        $this->get_field('_audios');
         var_dump($this->jet_engine_options);
         add_shortcode('display_jetengine_data', [$this, 'display_data_shortcode']);
     }
