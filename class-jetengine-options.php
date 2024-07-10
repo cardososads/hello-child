@@ -11,31 +11,25 @@ class JetEngine_Options {
     }
 
     public function get_introductions() {
-        $introductions = [];
-
-        $introductions['audio_introdutorio'] = get_option('_audio-introdutorio');
-        $introductions['legenda_intro'] = get_option('_legenda-intro');
-        $introductions['pos_intro'] = get_option('_pos-intro');
-        $introductions['legenda_pos_intro'] = get_option('_legenda-pos-intro');
-
-        return $introductions;
-    }
-
-    public function get_repeater($repeater_name) {
-        return get_option($repeater_name);
+        return [
+            'audio_introdutorio' => get_option('_audio-introdutorio'),
+            'legenda_intro' => get_option('_legenda-intro'),
+            'pos_intro' => get_option('_pos-intro'),
+            'legenda_pos_intro' => get_option('_legenda-pos-intro')
+        ];
     }
 
     public function get_all_repeaters() {
         $repeaters = [
-            '_numeros_destino_516',
-            '_numeros_expressao_masculinos',
-            '_numeros_expressao_femininos',
-            '_numeros_expressao_sem_genero',
-            '_numeros_motivacao_masculino_casado',
-            '_numeros_motivacao_masculino_solteiro',
-            '_numeros_motivacao_feminino_casada',
-            '_numeros_motivacao_feminino_solteira',
-            '_numeros_motivacao_outros'
+            'numeros_destino_516',
+            'numeros_expressao_masculinos',
+            'numeros_expressao_femininos',
+            'numeros_expressao_sem_genero',
+            'numeros_motivacao_masculino_casado',
+            'numeros_motivacao_masculino_solteiro',
+            'numeros_motivacao_feminino_casada',
+            'numeros_motivacao_feminino_solteira',
+            'numeros_motivacao_outros'
         ];
 
         $results = [];
