@@ -51,6 +51,7 @@ add_action('elementor_pro/forms/new_record', function ($record, $handler) {
     }
 
     // Instancia a classe de cálculo
+    require_once get_stylesheet_directory() . '/class-numerology-calculator.php';
     $calculator = new NumerologyCalculator();
 
     // Armazena os dados do formulário usando transients para acesso global
