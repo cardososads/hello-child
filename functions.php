@@ -62,7 +62,21 @@ add_action('elementor_pro/forms/new_record', function ($record, $handler) {
             }
             $data['destiny_number'] = $calculator->calculateDestinyNumber($data['birth_date']);
             set_transient('form1_submission_data', $data, 60 * 60); // Armazena por 1 hora
+
+            // Recupera os áudios de introdução e destino
+            $jet_engine_options = new JetEngine_Options();
+            $all_repeaters = $jet_engine_options->get_all_repeaters();
+
+            // Filtra o áudio correspondente ao número de destino
+            if (isset($all_repeaters['_numeros_destino_516'][$data['destiny_number']])) {
+                $data['destiny_audio'] = $all_repeaters['_numeros_destino_516'][$data['destiny_number']];
+            } else {
+                $data['destiny_audio'] = 'Nenhum áudio encontrado para o número de destino.';
+            }
+
+            set_transient('form1_submission_data', $data, 60 * 60); // Armazena por 1 hora
             break;
+
         case 'Form2':
             // Realiza o cálculo do número de expressão
             $data = [];
@@ -72,6 +86,7 @@ add_action('elementor_pro/forms/new_record', function ($record, $handler) {
             $data['expression_number'] = $calculator->calculateExpressionNumber($data['full_name']);
             set_transient('form2_submission_data', $data, 60 * 60); // Armazena por 1 hora
             break;
+
         case 'Form3':
             // Armazena os dados do formulário 3
             $data = [];
